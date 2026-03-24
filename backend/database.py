@@ -21,36 +21,7 @@ def get_db_connection():
  except:
       print("database exception occurred") 
 
-# import os
-# from dotenv import load_dotenv
-# from psycopg2 import pool
 
-# load_dotenv()
-# DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Rahul%40postgres@localhost:5432/attendance")
-
-# _pool = None
-# try:
-#     _pool = pool.SimpleConnectionPool(1, 10, dsn=DATABASE_URL)
-#     # quick test
-#     conn = _pool.getconn()
-#     cur = conn.cursor()
-#     cur.execute("SELECT 1")
-#     cur.close()
-#     _pool.putconn(conn)
-#     print("✅ PostgreSQL pool created")
-# except Exception as e:
-#     print("❌ PostgreSQL pool creation failed:", e)
-
-
-# def get_db():
-#     """FastAPI dependency: yields a psycopg2 connection from the pool."""
-#     conn = None
-#     try:
-#         if not _pool:
-#             raise RuntimeError("DB pool not initialized")
-#         conn = _pool.getconn()
-#         yield conn
-#     finally:
 #         if conn and _pool:
 #             try:
 #                 _pool.putconn(conn)
