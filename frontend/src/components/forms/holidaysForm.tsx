@@ -12,8 +12,11 @@ import { Input } from "@/components/ui/input"
 import { holidaySchema } from "@/components/forms/validations"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
+import { format, parse } from "date-fns"
 import { useholidayMutation } from "@/server/mutate"
+import { useStore } from "@tanstack/react-form"
+import { Spinner } from "@/components/ui/spinner"
+import React from "react"
 
 export type SigninPayload = {
     title: string
@@ -22,10 +25,14 @@ export type SigninPayload = {
 
 function HolidayForm({
     className,
+    setPopupOpen,
     ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & {
+    setPopupOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) {
+    const [openHolidayDate, setOpenHolidayDate] = React.useState(false)
 
-    const { mutate } = useholidayMutation()
+    const { mutateAsync } = useholidayMutation()
     const form = useForm({
         defaultValues: {
             title: "",
@@ -35,13 +42,17 @@ function HolidayForm({
             onSubmit: holidaySchema,
         },
         onSubmit: async ({ value }: { value: any }) => {
-              try {
-                mutate(value)
-              } catch (e) {
+            try {
+                await mutateAsync(value)
+                form.reset()
+                setPopupOpen(false)
+            } catch (e) {
                 console.error(e)
-              }
+            }
         },
     })
+
+    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -84,37 +95,32 @@ function HolidayForm({
                         children={(field) => {
                             const isInvalid =
                                 field.state.meta.isTouched && !field.state.meta.isValid
+                            const parsedHolidayDate = field.state.value
+                                ? parse(field.state.value, "yyyy-MM-dd", new Date())
+                                : undefined
 
                             return (
                                 <Field data-invalid={isInvalid}>
                                     <FieldLabel htmlFor="holiday_date">
                                         Holiday Date
                                     </FieldLabel>
-
-                                    <Popover>
+                                    <Popover open={openHolidayDate} onOpenChange={setOpenHolidayDate}>
                                         <PopoverTrigger asChild>
                                             <Button variant="outline" className="justify-start">
-                                                {field.state.value
-                                                    ? format(new Date(field.state.value), "PPP")
+                                                {parsedHolidayDate
+                                                    ? format(parsedHolidayDate, "PPP")
                                                     : "Pick a date"}
                                             </Button>
                                         </PopoverTrigger>
-
                                         <PopoverContent className="w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                selected={
-                                                    field.state.value
-                                                        ? new Date(field.state.value)
-                                                        : undefined
-                                                }
+                                                selected={parsedHolidayDate}
                                                 onSelect={(date) => {
                                                     if (!date) return
-
-                                                    const formatted =
-                                                        date.toISOString().split("T")[0]
-
+                                                    const formatted = format(date, "yyyy-MM-dd")
                                                     field.handleChange(formatted)
+                                                    setOpenHolidayDate(false)
                                                 }}
                                                 initialFocus
                                             />
@@ -130,7 +136,19 @@ function HolidayForm({
                     />
                 </FieldGroup>
                 <Field>
-                    <Button type="submit" form="form_holiday" className="mt-4 cursor-pointer">Add Holiday</Button>
+                    <Button
+                        type="submit"
+                        form="form_holiday"
+                        className="mt-4 cursor-pointer"
+                        disabled={isSubmitting}
+                    >
+                        {
+                            isSubmitting ?
+                                <Spinner data-icon="inline-start" />
+                                :
+                                "Add Holiday"
+                        }
+                    </Button>
                 </Field>
             </form>
         </div>

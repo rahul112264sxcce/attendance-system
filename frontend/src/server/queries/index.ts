@@ -1,6 +1,7 @@
 import useUserSession from "@/features/stores/usersStore";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+
 
 export const instance = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}`,
@@ -14,6 +15,42 @@ instance.interceptors.request.use((config) => {
     }
     return config
 })
+const getWorkFromHome = async () => {
+    try {
+        const res = await instance.get("/wfh/requests")
+        return res.data
+    }
+    catch (e) {
+        console.error("get user", e);
+    }
+}
+export const useWorkFromHomeRequestQuery = () => {
+    return useSuspenseQuery({
+        queryKey: ["workfromhome"],
+        queryFn: () => getWorkFromHome(),
+        retry: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+    })
+}
+const getLeaveRequest = async () => {
+    try {
+        const res = await instance.get("/leave-requests")
+        return res.data
+    }
+    catch (e) {
+        console.error("get user", e);
+    }
+}
+export const useLeaveRequestQuery = () => {
+    return useSuspenseQuery({
+        queryKey: ["leave_request"],
+        queryFn: () => getLeaveRequest(),
+        retry: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+    })
+}
 const getAttendanceAll = async () => {
     try {
         const res = await instance.get("/attendance/cumulative")
@@ -24,9 +61,10 @@ const getAttendanceAll = async () => {
     }
 }
 export const useAttendanceAllQuery = () => {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: ["attendance_all"],
         queryFn: () => getAttendanceAll(),
+        retry: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     })
@@ -40,11 +78,11 @@ const getAttendanceToday = async () => {
         console.error("get user", e);
     }
 }
-
 export const useAttendanceTodayQuery = () => {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: ["attendance_today"],
         queryFn: () => getAttendanceToday(),
+        retry: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     })
@@ -59,38 +97,38 @@ const getHolidays = async () => {
     }
 }
 export const useHolidaysQuery = () => {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: ["holidays"],
         queryFn: () => getHolidays(),
+        retry: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     })
 }
-
-const getUsers = async (todoId: any, role: any) => {
+const getUsers = async () => {
     try {
-        const res = await instance.get("/get-users", {
-            params: {
-                user_id: todoId,
-                role: role
-            }
-        })
+        const res = await instance.get("/get-users")
         return res.data.users
     }
-    catch (e) {
-        console.error("get user", e);
+    catch (error) {
+        throw error as AxiosError;
     }
 }
-
-
-export const useUsersQuery = (userId: any, role: any) => {
-    return useQuery({
-        queryKey: ["users", userId, role],
-        queryFn: () => getUsers(userId, role),
+export const useUsersQuery = () => {
+    return useSuspenseQuery({
+        queryKey: ["users"],
+        queryFn: () => getUsers(),
+        retry: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
-        enabled: !!userId
+        // enabled: !!userId
     })
 }
 
 
+// , {
+//             params: {
+//                 user_id: todoId,
+//                 role: 'employee'
+//             }
+//         })

@@ -7,15 +7,18 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import HolidayForm from "@/components/forms/holidaysForm"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useHolidaysQuery } from "@/server/queries"
+import HolidaysTable from "@/components/tables/holidaysTable"
+import React from "react"
 
 function Holidays() {
     const { data } = useHolidaysQuery()
+    const holidays = Array.isArray(data) ? data : data ? [data] : []
+    const [open, setPopupOpen] = React.useState<boolean>(false)
 
     return (
         <>
-            <Dialog>
+            <Dialog open={open} onOpenChange={setPopupOpen}>
                 <DialogTrigger asChild >
                     <Button className="w-25 cursor-pointer">Add Holiday</Button>
                 </DialogTrigger>
@@ -23,37 +26,10 @@ function Holidays() {
                     <DialogHeader>
                         <DialogTitle>Add Company Holiday</DialogTitle>
                     </DialogHeader>
-                    <HolidayForm />
+                    <HolidayForm setPopupOpen={setPopupOpen} />
                 </DialogContent>
             </Dialog>
-            <Table>
-                <TableHeader>
-                    <TableRow className='hover:bg-transparent'>
-                        <TableHead>SI No</TableHead>
-                        <TableHead>Tittle</TableHead>
-                        <TableHead>Holiday Date</TableHead>
-                        <TableHead>Action</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data?.map((item: any ,index :any) => (
-                        <TableRow key={item?.id}>
-                            <TableCell>
-                                <div className='font-medium'>{`${index +1}`}</div>
-                            </TableCell>
-                            <TableCell>
-                                <div className='font-medium'>{`${item.title}`}</div>
-                            </TableCell>
-                            <TableCell>
-                                <div className='font-medium'>{`${item.holiday_date}`}</div>
-                            </TableCell>
-                            <TableCell>
-                                Delete / Edit
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+            <HolidaysTable data={holidays} />
         </>
     )
 }

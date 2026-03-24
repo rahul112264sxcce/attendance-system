@@ -4,16 +4,19 @@ import PagenotFound from './components/pagenotFound';
 import { Spinner } from "@/components/ui/spinner"
 import ProtectedRoutes from '@/features/protectedRoutes';
 import LeaveRequest from './pages/leave';
+import { Toaster } from "sonner";
 function App() {
-  
+
   const SignUp = React.lazy(() => import('@/features/auth/SignUp'));
   const SignIn = React.lazy(() => import('@/features/auth/SignIn'));
   const Users = React.lazy(() => import('@/pages/users'));
   const Attendance = React.lazy(() => import('@/pages/attendance'));
   const Holidays = React.lazy(() => import('@/pages/holidays'));
+  const WorkFromHome = React.lazy(() => import('@/pages/workfromhome'));
 
   return (
     <>
+      <Toaster richColors position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="*" element={<PagenotFound />} />
@@ -36,7 +39,12 @@ function App() {
           <Route element={<ProtectedRoutes />} >
             <Route path={"/users"}
               element={
-                <React.Suspense fallback={<div className="h-[100dvh] flex justify-center items-center">< Spinner /></div>}>
+                <React.Suspense fallback={
+                  <div className="h-[100dvh] flex justify-center items-center">
+                    < Spinner />
+                  </div>
+                }
+                >
                   <Users />
                 </React.Suspense>
               }
@@ -59,6 +67,13 @@ function App() {
               element={
                 <React.Suspense fallback={<div className="h-[100dvh] flex justify-center items-center">< Spinner /></div>}>
                   <LeaveRequest />
+                </React.Suspense>
+              }
+            />
+            <Route path={"/workfromhome"}
+              element={
+                <React.Suspense fallback={<div className="h-[100dvh] flex justify-center items-center">< Spinner /></div>}>
+                  <WorkFromHome />
                 </React.Suspense>
               }
             />

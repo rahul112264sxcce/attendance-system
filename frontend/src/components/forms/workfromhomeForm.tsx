@@ -1,5 +1,4 @@
 "use client"
-import React from "react"
 import { cn } from "@/lib/utils"
 import { useForm } from "@tanstack/react-form"
 import { Button } from "@/components/ui/button"
@@ -9,27 +8,22 @@ import {
     FieldLabel,
     FieldError
 } from "@/components/ui/field"
-import { leavesSchema } from "@/components/forms/validations"
+import { workfromhomeSchema } from "@/components/forms/validations"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Textarea } from "@/components/ui/textarea"
 import { format } from "date-fns"
-import { useLeaveReqMutation } from "@/server/mutate"
+import { useWorkFromHomeMutation } from "@/server/mutate"
+import React from "react"
+import { Textarea } from "@/components/ui/textarea"
 import { useStore } from "@tanstack/react-form"
 import { Spinner } from "@/components/ui/spinner"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+
 export type SigninPayload = {
-    leave_type: string
+    title: string
     holiday_date: string
 }
-function LeavesForm({
+
+function WorkFromHomeForm({
     className,
     setPopupOpen,
     ...props
@@ -38,16 +32,15 @@ function LeavesForm({
 }) {
     const [openStart, setOpenStart] = React.useState(false)
     const [openEnd, setOpenEnd] = React.useState(false)
-    const { mutateAsync } = useLeaveReqMutation()
+    const { mutateAsync } = useWorkFromHomeMutation()
     const form = useForm({
         defaultValues: {
-            leave_type: "",
             start_date: "",
             end_date: "",
-            reason: "",
+            reason: ""
         },
         validators: {
-            onSubmit: leavesSchema,
+            onSubmit: workfromhomeSchema,
         },
         onSubmit: async ({ value }: { value: any }) => {
             try {
@@ -60,49 +53,16 @@ function LeavesForm({
         },
     })
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
-    const leaveTypes = ["sick leave", "casual leave", "annual leave", "unpaid leave", "maternity leave", "paternity leave", "bereavement leave"]
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <form
-                id="form_leave_req"
+                id="form_workhome"
                 onSubmit={(e) => {
                     e.preventDefault()
                     form.handleSubmit()
                 }}
             >
                 <FieldGroup className="gap-4">
-                    <form.Field
-                        name="leave_type"
-                        children={(field) => {
-                            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-                            return (
-                                <Field data-invalid={isInvalid} >
-                                    <FieldLabel>Leave Type</FieldLabel>
-                                    <Select
-                                        onValueChange={(value) => field.handleChange(value)}
-                                    >
-                                        <SelectTrigger className="w-full max-w-84">
-                                            <SelectValue placeholder="Select a leave type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {
-                                                    leaveTypes?.map((value, index) => {
-                                                        return (
-                                                            <div key={index}>
-                                                                <SelectItem key={index} value={value}>{value}</SelectItem>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                                </Field>
-                            )
-                        }}
-                    />
                     <form.Field
                         name="start_date"
                         children={(field) => {
@@ -112,10 +72,9 @@ function LeavesForm({
                                     <FieldLabel htmlFor="start_date">
                                         Start Date
                                     </FieldLabel>
-
                                     <Popover open={openStart} onOpenChange={setOpenStart}>
                                         <PopoverTrigger asChild>
-                                            <Button variant="outline" className="justify-start">
+                                            <Button variant="outline" className="justify-start" aria-invalid={isInvalid}>
                                                 {field.state.value
                                                     ? format(new Date(field.state.value), "PPP")
                                                     : "pick  start date"}
@@ -159,7 +118,7 @@ function LeavesForm({
                                     </FieldLabel>
                                     <Popover open={openEnd} onOpenChange={setOpenEnd}>
                                         <PopoverTrigger asChild>
-                                            <Button variant="outline" className="justify-start">
+                                            <Button variant="outline" className="justify-start" aria-invalid={isInvalid}>
                                                 {field.state.value
                                                     ? format(new Date(field.state.value), "PPP")
                                                     : "pick end date"}
@@ -177,7 +136,7 @@ function LeavesForm({
                                                     if (!date) return
                                                     const formatted = format(date, "yyyy-MM-dd") 
                                                     field.handleChange(formatted)
-                                                    setOpenEnd(false) 
+                                                    setOpenEnd(false)
                                                 }}
                                                 initialFocus
                                             />
@@ -202,16 +161,15 @@ function LeavesForm({
                                     <FieldLabel htmlFor="reason">
                                         Reason
                                     </FieldLabel>
-
                                     <Textarea
                                         id="reason"
                                         name={field.name}
                                         value={field.state.value}
                                         onBlur={field.handleBlur}
                                         onChange={(e) => field.handleChange(e.target.value)}
+                                        aria-invalid={isInvalid}
                                         placeholder="Enter reason"
                                     />
-
                                     {isInvalid && (
                                         <FieldError errors={field.state.meta.errors} />
                                     )}
@@ -223,7 +181,7 @@ function LeavesForm({
                 <Field>
                     <Button
                         type="submit"
-                        form="form_leave_req"
+                        form="form_workhome"
                         className="mt-4 cursor-pointer"
                         disabled={isSubmitting}
                     >
@@ -231,7 +189,7 @@ function LeavesForm({
                             isSubmitting ?
                                 <Spinner data-icon="inline-start" />
                                 :
-                                "Add Holiday"
+                                "Add Wrok  Home"
                         }
                     </Button>
                 </Field>
@@ -239,4 +197,4 @@ function LeavesForm({
         </div>
     )
 }
-export default LeavesForm;
+export default WorkFromHomeForm;

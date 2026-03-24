@@ -132,18 +132,7 @@ body {
     @apply bg-background text-foreground;
   }
 
-  /* wrapper */
-  /* container */
-  /* .fc-header-toolbar:nth-child(2) {
-    .fc-toolbar-chunk .fc-button-group {
-      background: #e5e5e5;
-      padding: 6px;
-      border-radius: 40px;
-      display: inline-flex;
-      gap: 6px;
-    }
-  }
- */
+
   .disabled-day {
     background-color: #f3f4f6;
     pointer-events: none;
@@ -151,7 +140,6 @@ body {
     cursor: not-allowed !important;
   }
 
-  /* buttons */
   .fc-button-group .fc-button {
     background: transparent !important;
     border: none !important;
@@ -161,7 +149,7 @@ body {
     font-weight: 500;
   }
 
-  /* active button */
+ 
   .fc-button-group .fc-button {
     transition: all 0.25s ease;
   }
@@ -172,15 +160,15 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
 
-  /* .fc .fc-button-primary:disabled {
+  .fc-button-primary {
     background-color: var(--primary) !important;
-    border-color: var(--primary) !important;
-    color: white !important 
   }
 
-  .fc .fc-button-primary {
-    background-color: var(--primary) !important;
-    border-color: var(--primary) !important;
-    color: white !important;
-  } */
+  .fc .fc-button-primary:focus {
+    box-shadow: var(--primary) 0px 0px 0px 0.2rem !important;
+  }
+
+  .fc .fc-button-group {
+    gap: 15px;
+  }
 }

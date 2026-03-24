@@ -6,29 +6,27 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import LeavesForm from "@/components/forms/leaveForm"
-import LeaveRequestTable from "@/components/tables/leaveReqTable"
+import WorkFromHomeForm from "@/components/forms/workfromhomeForm"
+import WorkFromHomeTable from "@/components/tables/workfromhomeTable"
 import React from "react"
 
-function LeaveRequest() {
+function WorkFromHome() {
     const [open, setPopupOpen] = React.useState<boolean>(false)
-
     return (
         <>
             <Dialog open={open} onOpenChange={setPopupOpen}>
                 <DialogTrigger asChild >
-                    <Button className="w-25 cursor-pointer">Request Leave</Button>
+                    <Button className="w-25 cursor-pointer">Add WFH</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-sm [&>button]:cursor-pointer [&>button]:mt-3" >
                     <DialogHeader>
-                        <DialogTitle>Add your Leave Days</DialogTitle>
+                        <DialogTitle>Add Work Home</DialogTitle>
                     </DialogHeader>
-                    <LeavesForm setPopupOpen={setPopupOpen} />
+                    <WorkFromHomeForm setPopupOpen={setPopupOpen}/>
                 </DialogContent>
             </Dialog>
-            <LeaveRequestTable />
+            <WorkFromHomeTable />
         </>
     )
 }
-
-export default LeaveRequest
+export default WorkFromHome

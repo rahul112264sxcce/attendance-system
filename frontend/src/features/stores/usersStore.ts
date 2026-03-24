@@ -30,7 +30,7 @@ const useUserSession = create<SessionState>()(
             logout: () => set({ user: null, accessToken: null, refreshToken: null }),
         }),
         {
-            name: "user-session", // the key used in localStorage to store the session
+            name: "user-session", 
             storage: createJSONStorage(() => sessionStorage)
         }
     )

@@ -11,11 +11,11 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Outlet ,useLocation} from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 
 export default function Layout() {
-   const location =  useLocation()
-   const newString = location?.pathname?.slice(1);
+    const location = useLocation()
+    const newString = location?.pathname?.slice(1);
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -28,10 +28,6 @@ export default function Layout() {
                             <BreadcrumbItem className="hidden md:block">
                                 <BreadcrumbLink href="#">{newString.toUpperCase()}</BreadcrumbLink>
                             </BreadcrumbItem>
-                            {/* <BreadcrumbSeparator className="hidden md:block" /> */}
-                            {/* <BreadcrumbItem>
-                                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                            </BreadcrumbItem> */}
                         </BreadcrumbList>
                     </Breadcrumb>
                 </header>

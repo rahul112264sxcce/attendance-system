@@ -20,6 +20,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { signinSchema } from "@/components/forms/validations"
 import { useSignInMutation } from "@/server/mutate";
+import { useStore } from "@tanstack/react-form"
+import { Spinner } from "@/components/ui/spinner"
 
 export type SigninPayload = {
   email: string
@@ -30,7 +32,7 @@ function SigninForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { mutate, isPending, isError, isSuccess } = useSignInMutation()
+  const { mutateAsync, isError, isSuccess } = useSignInMutation()
 
   const form = useForm({
     defaultValues: {
@@ -42,12 +44,13 @@ function SigninForm({
     },
     onSubmit: async ({ value }: { value: SigninPayload }) => {
       try {
-        mutate(value)
+        await mutateAsync(value)
       } catch (e) {
         console.error(e)
       }
     },
   })
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -114,6 +117,7 @@ function SigninForm({
                         </div>
                         <Input
                           id="password"
+                          type="password"
                           name={field.name}
                           value={field.state.value}
                           onBlur={field.handleBlur}
@@ -131,7 +135,19 @@ function SigninForm({
               />
             </FieldGroup>
             <Field>
-              <Button type="submit" form="form_signin" className="mt-4 cursor-pointer">Sign In</Button>
+              <Button
+                type="submit"
+                form="form_signin"
+                className="mt-4 cursor-pointer "
+                disabled={isSubmitting}
+              >
+                {
+                  isSubmitting ?
+                    <Spinner data-icon="inline-start" className="text-amber-50 " />
+                    :
+                    "Sign In"
+                }
+              </Button>
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <Link className="text-primary" to="/signup">Sign up</Link>
               </FieldDescription>

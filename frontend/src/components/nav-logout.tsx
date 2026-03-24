@@ -35,14 +35,16 @@ export function NavLogout({
                             size="lg"
                             className="
                             cursor-pointer
+                            bg-purple-200
+                            hover:bg-primary
+                            text-primary
+                        hover:text-white
                              data-[state=open]:bg-sidebar-accent 
                              data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <div className="grid flex-1 text-left text-sm leading-tight justify-center items-center">
-                                {/* <span className="truncate font-medium">{user.first_name}</span> */}
                                 <span className="
                                 truncate text-md 
-                                text-muted-foreground 
                                 ">
                                     {user.email}
                                 </span>
@@ -56,22 +58,8 @@ export function NavLogout({
                         align="end"
                         sideOffset={4}
                     >
+                        <DropdownMenuItem variant="destructive" onClick={handleLogout} className="cursor-pointer">
 
-                        {/* <DropdownMenuLabel className="p-0 font-normal">
-                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">{user.name}</span>
-                                    <span className="truncate text-xs text-muted-foreground">
-                                        {user.email}
-                                    </span>
-                                </div>
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuSeparator /> */}
-                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-100 hover:text-red-700">
-                            {/* <IconLogout /> */}
                             Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>

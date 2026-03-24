@@ -29,7 +29,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ...(user?.role === "admin"
         ? [
           {
-            title: "Users",
+            title: "Employees",
             url: "/users",
           },
         ]
@@ -51,12 +51,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ]
         : []),
+        {
+        title: "Work  home ",
+        url: "/workfromhome",
+      },
     ],
   }
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
-        <div className="text-3xl font-semibold  flex justify-center items-center tracking-[0.5rem]">
+      <SidebarHeader className=" items-center">
+         <span className="text-[8px]  bg-gradient-to-r from-indigo-500 to-pink-600 p-0.5 text-white rounded">
+            Attendance
+          </span>
+        <div className="text-3xl font-semibold tracking-[0.5rem]">         
           Software
         </div>
       </SidebarHeader>
