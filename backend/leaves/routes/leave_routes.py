@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends
 from leaves.schema.leave_schemas import LeaveRequest
-from leaves.services.leaves_services import create_leave_request,get_leave_requests
+from utils.validators import validate_status
+from leaves.services.leaves_services import (
+    create_leave_request,
+    get_leave_requests,
+    update_leave_status,
+)
 from utils.token import get_current_user
 
 router = APIRouter(tags=["Leave Request"])
@@ -8,7 +13,8 @@ router = APIRouter(tags=["Leave Request"])
 
 @router.post("/leave-request")
 def create_leave(data: LeaveRequest, current_user=Depends(get_current_user)):
-    user_id = current_user
+    user_id = current_user["id"]
+    print(data, "data")
     return create_leave_request(user_id, data)
 
 
@@ -16,4 +22,11 @@ def create_leave(data: LeaveRequest, current_user=Depends(get_current_user)):
 def get_leave(current_user=Depends(get_current_user)):
     user_id = current_user["id"]
     role = current_user["role"]
-    return get_leave_requests(user_id,role)
+    return get_leave_requests(user_id, role)
+
+
+@router.put("/leave/{leave_id}")
+def update_leave(leave_id: int, status: str, current_user=Depends(get_current_user)):
+    validate_status(status)
+    user_id = current_user["id"]
+    return update_leave_status(leave_id, user_id, status)

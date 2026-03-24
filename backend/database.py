@@ -2,13 +2,14 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 def get_db_connection():
+ try:
     load_dotenv()
     host = os.getenv("host")
     database = os.getenv("database")
     user = os.getenv("user")
     password = os.getenv("password")
     port = os.getenv("port")
-    print(host)
+
     conn = psycopg2.connect(
         host=host,
         database=database,
@@ -17,8 +18,8 @@ def get_db_connection():
         port=port
     )
     return conn
-
-    
+ except:
+      print("database exception occurred") 
 
 # import os
 # from dotenv import load_dotenv

@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 from database import get_db_connection
 from utils.dbHelpers import close_db
-
 from fastapi import HTTPException
 
 
