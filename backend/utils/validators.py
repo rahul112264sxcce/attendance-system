@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 import re
 
 
@@ -26,3 +27,12 @@ def validate_password(value: str):
     if len(value) < 3:
         raise ValueError("min 3 characters")
     return value
+
+ALLOWED_STATUS = ("approved", "rejected", "pending")
+
+def validate_status(status: str):
+    if status not in ALLOWED_STATUS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid status request"
+        )

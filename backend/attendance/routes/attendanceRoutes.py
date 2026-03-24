@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends
+from fastapi import APIRouter, Depends
 from attendance.services.attendanceService import (
     add_attendence,
     close_attendance,
@@ -6,9 +6,7 @@ from attendance.services.attendanceService import (
     get_all_attendance
 )
 from utils.token import get_current_user
-from attendance.schemas.attendanceSchemas import AttendanceSchema
-from auth.schemas.authSchemas import userSchema
-router = FastAPI()
+
 
 router = APIRouter(
     prefix="/attendance", tags=["Attendance"]
@@ -34,5 +32,4 @@ def today_attendance(current_user= Depends(get_current_user)):
 @router.get("/cumulative")
 def everyday_attendance(current_user= Depends(get_current_user)):
     user_id = current_user["id"]
-    print(user_id)
     return get_all_attendance(user_id)

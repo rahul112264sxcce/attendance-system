@@ -1,6 +1,22 @@
+from fastapi import HTTPException
 from pydantic import BaseModel, field_validator
 from utils.validators import validate_email, validate_password, validate_required_string
 
+  
+    
+class UserQuery(BaseModel):
+    user_id: int
+    role: str
+    
+    @field_validator("role")
+    def validate_role(cls, value):
+        if value != "admin":
+            raise HTTPException(
+                status_code=403,
+                detail="Only admin can access"
+            )
+        return value
+    
 class signinSchema(BaseModel):
     email: str
     password: str

@@ -3,6 +3,7 @@ from database import get_db_connection
 from utils.dbHelpers import close_db
 from psycopg2.extras import RealDictCursor
 from utils.token import create_access_token
+import bcrypt
 
 def generate_employee_id(cur):
     cur.execute("SELECT COUNT(*) FROM users")
@@ -32,12 +33,33 @@ def signin_user(email: str, password: str):
         user = cur.fetchone()
 
         if not user:
-            raise HTTPException(status_code=404, detail="Invalid email")
+            raise HTTPException(status_code=404, detail="Invalid email or password")
 
         user_id, user_email, db_password, role = user
+        
+        if db_password.startswith("$2"):
+  
+            if not bcrypt.checkpw(password.encode('utf-8'), db_password.encode('utf-8')):
+                raise HTTPException(status_code=401, detail="Invalid email or password")
 
-        if password != db_password:
-            raise HTTPException(status_code=401, detail="Invalid email")
+        else:
+     
+            if password != db_password:
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        
+            hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            ).decode('utf-8')
+
+            cur.execute(
+                "UPDATE users SET password = %s WHERE id = %s",
+                (hashed_password, user_id)
+            )
+            conn.commit()
+
+        
         token = create_access_token({"user_id": user_id})
         
         return {
@@ -71,7 +93,12 @@ def create_user(data):
 
         if user:
             raise HTTPException(status_code=400, detail="User already exists")
-
+        
+        hashed_password = bcrypt.hashpw(
+            data.password.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+        
         query = """
         INSERT INTO users (employee_id,first_name, last_name, email, password ,role, status)
         VALUES (%s,%s, %s, %s, %s,%s,%s)
@@ -85,7 +112,7 @@ def create_user(data):
                 data.firstname,
                 data.lastname,
                 data.email,
-                data.password,
+                hashed_password,
                 data.role,
                 data.status
             ),
@@ -105,10 +132,17 @@ def create_user(data):
         close_db(conn, cur)
 
 
-def get_users(user_id: int, role: str):
+def get_users(current_user):
+    user_id = current_user["id"]
+    role = current_user["role"]
+    
+    if role != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access")
+    
     conn = None
     cur = None
     try:
+     
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
