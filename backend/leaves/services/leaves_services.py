@@ -102,6 +102,16 @@ def get_leave_requests(current_user):
     try:
         user_id = current_user.id
         role = current_user.role.value   
+        today = date.today()
+
+        db.query(LeaveRequest).filter(
+            LeaveRequest.status == LeaveStatus.pending,
+            LeaveRequest.end_date < today
+        ).update(
+            {LeaveRequest.status: LeaveStatus.rejected},
+            synchronize_session=False
+        )
+        db.commit()
 
         if role == "admin":
             records = (

@@ -114,6 +114,16 @@ def create_wfh_request(user_id: int, data):
 def get_wfh_requests(current_user):
     db = SessionLocal()
     try:
+        today = date.today()
+        db.query(WFHRequest).filter(
+            WFHRequest.status == WFHStatus.pending,
+            WFHRequest.end_date < today
+        ).update(
+            {WFHRequest.status: WFHStatus.rejected},
+            synchronize_session=False
+        )
+        db.commit()
+
         query = db.query(WFHRequest).options(joinedload(WFHRequest.user))
 
         if current_user.role.value != "admin":
@@ -141,6 +151,7 @@ def get_wfh_requests(current_user):
         raise
     
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
     finally:
