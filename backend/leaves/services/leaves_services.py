@@ -18,7 +18,6 @@ def create_leave_request(current_user, data):
     try:
         user_id = current_user.id
 
-        # ✅ Past date check
         if data.start_date < date.today():
             raise HTTPException(
                 status_code=400,
@@ -29,8 +28,7 @@ def create_leave_request(current_user, data):
             raise HTTPException(
                 status_code=400, detail="Start date cannot be after end date"
             )
-        # ✅ Ove
-        # lapping leave check
+        
         existing_leave = (
             db.query(LeaveRequest)
             .filter(
@@ -48,7 +46,6 @@ def create_leave_request(current_user, data):
                 detail="You already have a leave request",
             )
 
-        # ✅ Holiday check (NEW 🔥)
         current_date = data.start_date
 
         while current_date <= data.end_date:
@@ -67,7 +64,6 @@ def create_leave_request(current_user, data):
 
             current_date += timedelta(days=1)
 
-        # ✅ Create leave request
         new_leave = LeaveRequest(
             user_id=user_id,
             leave_type=data.leave_type,
@@ -203,14 +199,12 @@ def update_leave_status(leave_id: int, admin_id: int, status: str):
         leave.status = status_enum
         leave.approved_by = admin_id
 
-        # ✅ ONLY when leave is approved
         if status_enum == LeaveStatus.approved:
 
             current_date = start_date
 
             while current_date <= end_date:
 
-                # 🔍 Skip holidays
                 holiday = (
                     db.query(Holidays)
                     .filter(Holidays.holiday_date == current_date)
@@ -219,7 +213,6 @@ def update_leave_status(leave_id: int, admin_id: int, status: str):
 
                 if not holiday:
 
-                    # 🔍 Check if attendance already exists
                     existing_attendance = (
                         db.query(Attendance)
                         .filter(
@@ -229,19 +222,16 @@ def update_leave_status(leave_id: int, admin_id: int, status: str):
                         .first()
                     )
 
-                    # ✅ Create attendance only if not exists
                     if not existing_attendance:
                         attendance = Attendance(
                             user_id=user_id,
                             attendance_date=current_date,
-                            status=AttendanceStatus.LEAVE   # ✅ FIXED
+                            status=AttendanceStatus.LEAVE   
                         )
                         db.add(attendance)
 
-                # ✅ VERY IMPORTANT (fix infinite loop)
                 current_date += timedelta(days=1)
 
-            # ✅ Auto-reject overlapping WFH requests
             overlapping_wfh = (
                 db.query(WFHRequest)
                 .filter(
@@ -269,165 +259,4 @@ def update_leave_status(leave_id: int, admin_id: int, status: str):
 
     finally:
         db.close()        
-        
-# def update_leave_status(leave_id: int, admin_id: int, status: str):
-#     db = SessionLocal()
-
-#     try:
-#         leave = (
-#             db.query(LeaveRequest)
-#             .filter(LeaveRequest.id == leave_id)
-#             .first()
-#         )
-
-#         if not leave:
-#             raise HTTPException(404, "Leave request not found")
-
-#         user_id = leave.user_id
-#         leave_type = leave.leave_type
-#         start_date = leave.start_date
-#         end_date = leave.end_date
-
-#         try:
-#             status_enum = LeaveStatus(status)
-#         except ValueError:
-#             raise HTTPException(400, "Invalid status")
-
-#         leave.status = status_enum
-#         leave.approved_by = admin_id
-
-#         # ✅ ONLY when leave is approved
-#         if status_enum == LeaveStatus.approved:
-
-#             current_date = start_date
-
-#             while current_date <= end_date:
-
-#                 # 🔍 Skip holidays
-#                 holiday = (
-#                     db.query(Holidays)
-#                     .filter(Holidays.holiday_date == current_date)
-#                     .first()
-#                 )
-
-#                 if not holiday:
-
-#                     # 🔍 Check if attendance already exists
-#                     existing_attendance = (
-#                         db.query(Attendance)
-#                         .filter(
-#                             Attendance.user_id == user_id,
-#                             Attendance.attendance_date == current_date,
-#                         )
-#                         .first()
-#                     )
-
-#                     # ✅ Create attendance only if not exists
-#                     if not existing_attendance:
-#                         attendance = Attendance(
-#                             user_id=user_id,
-#                             attendance_date=current_date,
-#                             status=leave_type  # ⚠️ ensure this matches AttendanceStatus
-#                         )
-#                         db.add(attendance)
-
-#                 # ✅ VERY IMPORTANT (fix infinite loop)
-#                 current_date += timedelta(days=1)
-
-#         db.commit()
-
-#         return {"message": f"Leave {status} successfully"}
-
-#     except HTTPException:
-#         raise
-
-#     except Exception as e:
-#         db.rollback()
-#         raise HTTPException(status_code=500, detail=str(e))
-
-#     finally:
-#         db.close() 
- 
-        
-        
-# def update_leave_status(leave_id: int, admin_id: int, status: str):
-#     db = SessionLocal()
-
-#     try:
-        
-#         leave = (
-#             db.query(LeaveRequest)
-#             .filter(LeaveRequest.id == leave_id)
-#             .first()
-#         )
-
-#         if not leave:
-#             raise HTTPException(404, "Leave request not found")
-
-#         user_id = leave.user_id
-#         leave_type = leave.leave_type
-#         start_date = leave.start_date
-#         end_date = leave.end_date
-
-#         try:
-#             status_enum = LeaveStatus(status)
-#         except ValueError:
-#             raise HTTPException(400, "Invalid status")
-
-        
-#         leave.status = status_enum
-#         leave.approved_by = admin_id
-
-       
-#         if status_enum == LeaveStatus.approved:
-
-#             current_date = start_date
-
-#             while current_date <= end_date:
-
-                
-#                 holiday = (
-#                     db.query(Holidays)
-#                     .filter(Holidays.holiday_date == current_date)
-#                     .first()
-#                 )
-
-#                 # if not holiday:
-#                 #     # 🔍 Check if already exists (simulate ON CONFLICT DO NOTHING)
-#                 #     existing_attendance = (
-#                 #         db.query(Attendance)
-#                 #         .filter(
-#                 #             Attendance.user_id == user_id,
-#                 #             Attendance.attendance_date == current_date,
-#                 #         )
-#                 #         .first()
-#                 #     )
-
-#                 #     if not existing_attendance:
-#                 #         attendance = Attendance(
-#                 #             user_id=user_id,
-#                 #             attendance_date=current_date,
-#                 #             status=leave_type.value  # enum → string
-#                 #         )
-#                 #         db.add(attendance)
-
-#                 # current_date += timedelta(days=1)
-
-#         db.commit()
-
-#         return {"message": f"Leave {status} successfully"}
-
-#     except HTTPException:
-#         raise
-
-#     except Exception as e:
-#         db.rollback()
-#         raise HTTPException(status_code=500, detail=str(e))
-
-#     finally:
-#         db.close()        
-        
-        
-
-        
         
