@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router-dom"
-import useLanguageStore from "../stores/useLanguageStore"
 import { AppSidebar } from "@/components/app-sidebar"
 import NotificationSheet from "@/components/notification/notification-sheet"
 import {
@@ -22,15 +21,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
+import i18n from "@/helpers/i18n/config";
 export default function Layout() {
-    const lang = useLanguageStore((state: any) => state.lang);
-    const changeLanguage = useLanguageStore((state: any) => state.changeLanguage);
     const location = useLocation()
     const newString = location?.pathname?.slice(1);
 
-    
-
+    const changeLanguage = async (
+        lang: string
+      ) => {
+      
+        await i18n.changeLanguage(lang)
+      }
 
     return (
         <SidebarProvider>
@@ -51,17 +52,19 @@ export default function Layout() {
                     <div className="flex items-center gap-4">
                         <NotificationSheet />
                         <Select
-                            value={lang}
-                            onValueChange={changeLanguage}
+                           defaultValue="en"
+                           onValueChange={(value) =>
+                             changeLanguage(value)
+                           }
                         >
-                            <SelectTrigger className="w-[100px] focus:border-primary focus:outline-none focus:ring-0">
+                            <SelectTrigger className="w-[70px] h-8 focus:border-primary focus:outline-none focus:ring-0">
                                 <SelectValue placeholder="Select language" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="w-[70px] min-w-[70px]">
                                 <SelectGroup>
-                                    <SelectItem value="en">English</SelectItem>
-                                    <SelectItem value="ta">Tamil</SelectItem>
-                                    <SelectItem value="hi">Hindi</SelectItem>
+                                    <SelectItem value="en" >En</SelectItem>
+                                    <SelectItem value="ta" >Ta</SelectItem>
+                                    <SelectItem value="hi" >Hi</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>

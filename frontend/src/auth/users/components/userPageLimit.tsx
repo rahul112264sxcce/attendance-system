@@ -16,7 +16,7 @@ type UserPageLimitProps = {
 }
 
 const UserPageLimit = ({ limit, setLimit ,total}: UserPageLimitProps) => {
-    const customLimit = ["10", "20", "30", "40", "50"]
+
     const limitOptions =
         total > 0
             ? Array.from(

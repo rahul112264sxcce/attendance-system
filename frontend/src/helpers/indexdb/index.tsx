@@ -1,7 +1,8 @@
+
 import { openDB } from "idb";
 
-const DB_NAME = import.meta.env.REACT_APP_LANGDB
-const STORE = import.meta.env.REACT_APP_LANGSTORE;
+const DB_NAME = import.meta.env.REACT_APP_LANGDB || "langDB";
+const STORE = import.meta.env.REACT_APP_LANGSTORE || "langStore";
 
 export async function initDB() {
   return openDB(DB_NAME, 1, {
@@ -12,11 +13,16 @@ export async function initDB() {
 }
 
 export async function setLanguage(lang: string) {
+  
   const db = await initDB();
-  return db.put(STORE, lang, "language");
+  const result = await db.put(STORE, lang, "language");
+  return result;
 }
 
 export async function getLanguage() {
   const db = await initDB();
   return (await db.get(STORE, "language")) || "en";
 }
+
+
+

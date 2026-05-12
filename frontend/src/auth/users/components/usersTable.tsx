@@ -9,7 +9,6 @@ import {
 import type { UsersTableProps } from "../types/users.types"
 import { ChevronUp } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
-// import { Spinner } from "@/components/ui/spinner";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Spinner } from "@/components/ui/spinner";
 
@@ -44,10 +43,14 @@ function UsersTable({ users, noUser, loading, setOrder }: UsersTableProps) {
                             <TableHead>Role</TableHead>
                         </TableRow>
                     </TableHeader>
-
                     <TableBody>
-                        {loading && (<Spinner />)}
-                        {noUser ? (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center py-6">
+                                    <Spinner className="mx-auto" />
+                                </TableCell>
+                            </TableRow>
+                        ) : noUser ? (
                             <TableRow>
                                 <TableCell colSpan={4} className="text-center h-100  text-gray-500">
                                     No users found
@@ -67,7 +70,6 @@ function UsersTable({ users, noUser, loading, setOrder }: UsersTableProps) {
                 </Table>
             </ScrollArea>
         </>
-
     )
 }
 

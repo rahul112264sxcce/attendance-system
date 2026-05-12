@@ -4,6 +4,7 @@ import type { LoginPayload, LoginResponse } from "@/auth/login/types/login.types
 import type { registerPayload, registerResponse } from "@/auth/register/types/register.types";
 import type { AxiosError } from "axios";
 import type { GetUsersParams, UsersResponse } from "../users/types/users.types";
+import { setLanguage } from "@/helpers/indexdb";
 
 const registerApi = async (data: registerPayload): Promise<registerResponse> => {
     const response = await instance.post<registerResponse>(`/create-users`, data)
@@ -27,8 +28,21 @@ const getUsers = async (params: GetUsersParams): Promise<UsersResponse> => {
     }
 }
 
+const getTranslations = async (): Promise<any> => {
+    try {
+        const res = await instance.get<any>(`/translations`)
+        console.log(res.data, "res.data translations");
+        await setLanguage(res.data);
+        // return res.data
+    }
+    catch (error) {
+        throw error as AxiosError;
+    }
+}
+
 export {
     registerApi,
     loginApi,
-    getUsers
+    getUsers,
+    getTranslations
 }

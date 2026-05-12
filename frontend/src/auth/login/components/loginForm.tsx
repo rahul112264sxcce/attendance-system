@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom";
 import { loginSchema, type LoginPayload } from "@/helpers/validation/validations"
 import { useForm } from "@tanstack/react-form"
-import { useLoginMutation } from "@/auth/hooks/useAuthHooks";
+import { useGetTranslations, useLoginMutation } from "@/auth/hooks/useAuthHooks";
 import { useStore } from "@tanstack/react-form"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -32,19 +32,20 @@ function LoginForm({
 
   const { mutateAsync } = useLoginMutation()
   const [showpassword, setShowPassword] = React.useState<boolean>(false)
-
-  const form = useForm({
-    defaultValues: {
-      email: "",
-      password: ""
-    } as LoginPayload,
-    validators: {
-      onBlur: loginSchema,
-    },
-    onSubmit: async ({ value }) => {
-      await mutateAsync(value)
-    },
-  })
+  const { refetch } = useGetTranslations()
+    const form = useForm({
+      defaultValues: {
+        email: "",
+        password: ""
+      } as LoginPayload,
+      validators: {
+        onBlur: loginSchema,
+      },
+      onSubmit: async ({ value }) => {
+        await mutateAsync(value)
+        await refetch()
+      },
+    })
 
   const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 

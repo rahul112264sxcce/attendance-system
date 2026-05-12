@@ -5,6 +5,7 @@ from holiday.routes.holiday_routes import router as holiday_router
 from leaves.routes.leave_routes import router as leaves_router
 from workfromhome.routes.wft_routes import router as wft_routes
 from fastapi.middleware.cors import CORSMiddleware
+from translations.main import router as translation_router
 
 app = FastAPI()
 
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(translation_router)
 app.include_router(auth_router)
 app.include_router(attendance_router)
 app.include_router(holiday_router)

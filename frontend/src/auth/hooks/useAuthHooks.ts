@@ -9,14 +9,28 @@ import { toast } from "sonner";
 import type { registerPayload, registerResponse, } from "../register/types/register.types";
 import { useSetUser } from "@/helpers/stores/usersStore";
 import type { GetUsersParams } from "../users/types/users.types";
+export const useGetTranslations = () => {
+    return useQuery({
+        queryKey: ["translations"],
+        queryFn: () => api.getTranslations(),
+        placeholderData: (prev: any) => prev,
+        retry: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+    })
+}
+
 
 export const useLoginMutation = () => {
     const navigate = useNavigate();
     const setUser = useSetUser();
 
+    const queryClient = useQueryClient()
     return useMutation<LoginResponse, Error, LoginPayload>({
+
         mutationFn: api.loginApi,
         onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["translations"] })
             const { user_id, email, role, access_token, message } = data
             setUser({
                 user_id,
